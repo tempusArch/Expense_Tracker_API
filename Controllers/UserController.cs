@@ -41,7 +41,7 @@ public class UserController : ControllerBase {
         if (loginedUser == null || !BCrypt.Net.BCrypt.Verify(lm.Password, loginedUser.PasswordHash))
             return Unauthorized();
 
-        var accessToken = _jwtService.Generate_JWT_Token(loginedUser);
+        var accessToken = _jwtService.Generate_JWT(loginedUser);
         var refreshToken = _jwtService.Generate_RefreshToken(loginedUser.Id.ToString());
 
         _context.RefreshTokenTable.Add(refreshToken);
@@ -66,7 +66,7 @@ public class UserController : ControllerBase {
 
         var kyuuRefreshToken = await _context.RefreshTokenTable.SingleOrDefaultAsync(n => n.Token == valueOfRefreshToken);
 
-        if (kyuuRefreshToken == null || !kyuuRefreshToken.IfActive)
+        if (kyuuRefreshToken == null || !kyuuRefreshToken.IsActive)
             return Unauthorized();
 
         kyuuRefreshToken.RevokedAt = DateTime.UtcNow;
@@ -76,7 +76,7 @@ public class UserController : ControllerBase {
         await _context.SaveChangesAsync();
 
         var um = await _context.UserTable.SingleOrDefaultAsync(n => n.Id == int.Parse(kyuuRefreshToken.UserId));
-        var newAccessToken = _jwtService.Generate_JWT_Token(um);
+        var newAccessToken = _jwtService.Generate_JWT(um);
 
         Response.Cookies.Append("RefreshToken", newRefreshToken.Token, new CookieOptions {
             HttpOnly = true,

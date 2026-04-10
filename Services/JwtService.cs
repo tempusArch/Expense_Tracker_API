@@ -12,12 +12,12 @@ namespace ExpenseTrackerApi.Services;
 public class JwtService {
     private readonly ExpenseTrackerApiDbContext _context;
     private readonly IConfiguration _config;
-    public JwtService (ExpenseTrackerApiDbContext context, IConfiguration config) {
+    public JwtService(ExpenseTrackerApiDbContext context, IConfiguration config) {
         _context = context;
         _config = config;
     }
 
-    public string Generate_JWT_Token(UserModel um) {
+    public string Generate_JWT(UserModel um) {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -33,7 +33,7 @@ public class JwtService {
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(30),
             signingCredentials: credentials
-        );
+        );                                                                              
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

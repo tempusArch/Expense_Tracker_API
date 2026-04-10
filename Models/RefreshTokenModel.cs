@@ -9,6 +9,6 @@ public class RefreshTokenModel {
     public DateTime CreatedAt {get; set;}
     public DateTime? RevokedAt {get; set;}
 
-    public bool IfExpired => DateTime.UtcNow >= ExpiresAt;
-    public bool IfActive => RevokedAt == null && !IfExpired;
+    public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+    public bool IsActive => RevokedAt == null && !IsExpired;
 }
